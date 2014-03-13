@@ -8,7 +8,7 @@
 
 exname="$(basename "$0")"
 
-FILES="setup.cfg CHANGELOG.rst"
+FILES="setup.py setup.cfg CHANGELOG.rst"
 
 ##
 ## Functions
