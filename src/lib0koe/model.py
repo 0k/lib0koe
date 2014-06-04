@@ -24,6 +24,34 @@ from functools import wraps
 from . import common
 
 
+def edit_select(column, actions):
+    """Returns given list modified with a sequence of specific actions
+
+    Actions can replace, insert before or after a specific element. The target
+    element is found thanks to callable predicate.
+
+    Each actions is a tuple (predicate, action_type, element)
+
+        >>> l = [1, 3, 5, 8, 8]
+        >>> is_pair = lambda x: x % 2 == 0
+        >>> is_nb = lambda nb: (lambda x: x == nb)
+        >>> edit_list(l, [(is_pair, 'replace', 9), ])()
+        [1, 3, 5, 9, 8]
+
+    Note that only the first matching element will trigger the action.
+
+        >>> edit_list(l, [(is_nb(3), 'before', 'x'), ])
+        [1, 'x', 3, 5, 8, 8]
+        >>> edit_list(l, [(is_nb(3), 'after', 'x'), ])
+        [1, 3, 'x', 5, 8, 8]
+
+    """
+    def _selection(model, cr, uid, context):
+        l = column.select.reify(cr, uid, model, column, context)
+        return edit_list(l, actions)
+    return _selection
+
+
 def edit_list(l, actions):
     """Returns given list modified with a sequence of specific actions
 
@@ -35,7 +63,7 @@ def edit_list(l, actions):
         >>> l = [1, 3, 5, 8, 8]
         >>> is_pair = lambda x: x % 2 == 0
         >>> is_nb = lambda nb: (lambda x: x == nb)
-        >>> edit_list(l, [(is_pair, 'replace', 9), ])
+        >>> edit_list(l, [(is_pair, 'replace', 9), ])()
         [1, 3, 5, 9, 8]
 
     Note that only the first matching element will trigger the action.
